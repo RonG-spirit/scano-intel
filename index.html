@@ -284,6 +284,25 @@ async function askSAVI(query) {
   conversationHistory.push({ role: 'user', content: query });
 
   try {
+    // Step 1: Get fresh Zoho access token using refresh token
+    const zohoClientId = '1000.H1YFO3Z6VCMUHVKUZRQMCI56JZ34OT';
+    const zohoClientSecret = '8062f8e6d62a21e32587146f954b98733d23721683';
+    const zohoRefreshToken = '1000.a4e7e366f19927ddfafa4d7cc5ab149f.9d97889fdc3c7b81a4f6fca18f0d098e';
+    
+    let zohoAccessToken = '';
+    try {
+      const tokenResp = await fetch('https://accounts.zoho.in/oauth/v2/token', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'refresh_token=' + zohoRefreshToken + '&client_id=' + zohoClientId + '&client_secret=' + zohoClientSecret + '&grant_type=refresh_token'
+      });
+      const tokenData = await tokenResp.json();
+      zohoAccessToken = tokenData.access_token || '';
+    } catch(e) {
+      console.error('Zoho token refresh failed:', e);
+    }
+
+    // Step 2: Call Claude with the fresh Zoho token
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -301,7 +320,8 @@ async function askSAVI(query) {
         mcp_servers: [{
           type: 'url',
           url: 'https://scano-zoho-mcp-60066943977.zohomcp.in/mcp/sse?key=d811aad221ae7db3911cbc2bd7a0230f',
-          name: 'zoho-crm'
+          name: 'zoho-crm',
+          authorization_token: zohoAccessToken
         }]
       })
     });
