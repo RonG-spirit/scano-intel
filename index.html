@@ -309,7 +309,7 @@ async function askSAVI(query) {
         'Content-Type': 'application/json',
         'x-api-key': _k,
         'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'mcp-client-2025-04-04',
+        'anthropic-beta': 'mcp-client-2025-11-20',
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
@@ -319,9 +319,13 @@ async function askSAVI(query) {
         messages: conversationHistory,
         mcp_servers: [{
           type: 'url',
-          url: 'https://scano-zoho-mcp-60066943977.zohomcp.in/mcp/sse?key=d811aad221ae7db3911cbc2bd7a0230f',
+          url: 'https://scano-zoho-mcp-60066943977.zohomcp.in/mcp/message?key=d811aad221ae7db3911cbc2bd7a0230f',
           name: 'zoho-crm',
           authorization_token: zohoAccessToken
+        }],
+        tools: [{
+          type: 'mcp_toolset',
+          mcp_server_name: 'zoho-crm'
         }]
       })
     });
